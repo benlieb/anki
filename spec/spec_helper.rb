@@ -1,3 +1,4 @@
+require 'pry'
 require 'anki'
 
 RSpec.configure do |config|

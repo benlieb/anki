@@ -1,15 +1,18 @@
 require "spec_helper"
+require "awesome_print"
 
 RSpec.describe Anki::Deck do
+  let(:subject) { Anki::Deck.new }
+  let(:headers) { ["front", "back"] }
+  let(:cards) {
+    [
+      { "front" => "a", "back" => "b" },
+      { "front" => "c", "back" => "d" }
+    ]
+  }
+  let(:deck) { Anki::Deck.new(card_headers: headers, card_data: cards) }
+
   describe "#generate_deck" do
-    subject { Anki::Deck.new }
-    let(:headers) { ["front", "back"] }
-    let(:cards) {
-      [
-        { "front" => "a", "back" => "b" },
-        { "front" => "c", "back" => "d" }
-      ]
-    }
 
     it "raises an ArgumentError if card_header is not an array" do
       subject.card_headers = "I'm card_header!"
@@ -21,6 +24,7 @@ RSpec.describe Anki::Deck do
 
     it "raises an ArgumentError if card_header is an empty array" do
       subject.card_headers = []
+      subject.card_data = cards
 
       expect {
         subject.generate_deck
@@ -66,6 +70,16 @@ RSpec.describe Anki::Deck do
       subject.generate_deck(file: "/tmp/anki_deck.txt")
       expect(File.exist?("/tmp/anki_deck.txt")).to be_truthy
     end
+  end
 
+  describe "#new" do
+    it "sets a default directory" do 
+      expect(deck.user_media_dir).to eq(Dir.pwd)
+    end
+
+    it "accepts an optional user_media_dir" do 
+      deck = Anki::Deck.new(user_media_dir: '/foo')
+      expect(deck.user_media_dir).to eq('/foo')
+    end
   end
 end
